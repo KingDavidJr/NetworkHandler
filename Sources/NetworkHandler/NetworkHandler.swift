@@ -17,8 +17,10 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     
     @available(iOS 15.0, macOS 12.0, *)
     public func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
+        print("NetworkHandler Debug: fetchData called for URL: \(url.absoluteString)") // Added
         do {
             guard url != URL("") else {
+                print("NetworkHandler Debug: ERROR - Invalid URL passed: \(url.absoluteString)") // Added
                 throw NetworkError.invalidURL
             }
             var request = URLRequest(url: url)
@@ -29,19 +31,30 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
                     request.addValue(value, forHTTPHeaderField: key)
                 }
             }
+            
+            print("NetworkHandler Debug: Starting URLSession data task...") // Added
             let (data, response) = try await URLSession.shared.data(for: request)
+            print("NetworkHandler Debug: URLSession data task completed.") // Added
+
             if let httpResponse = response as? HTTPURLResponse {
+                print("NetworkHandler Debug: Received HTTP Status Code: \(httpResponse.statusCode)") // Added
                 guard (200...299).contains(httpResponse.statusCode) else {
+                    print("NetworkHandler Debug: ERROR - HTTP Error: \(httpResponse.statusCode)") // Added
                     throw NetworkError.httpError(statusCode: httpResponse.statusCode, response: response)
                 }
+                print("NetworkHandler Debug: Data length: \(data.count) bytes") // Added
                 return data
+            } else {
+                print("NetworkHandler Debug: ERROR - Invalid response type (not HTTPURLResponse).") // Added
+                throw NetworkError.invalidResponse
             }
         } catch let urlError as URLError {
+            print("NetworkHandler Debug: Caught URLError: \(urlError.localizedDescription) (Code: \(urlError.code.rawValue))") // Added
             throw NetworkError.requestFailed(urlError)
         } catch  {
+            print("NetworkHandler Debug: Caught generic error: \(error.localizedDescription)") // Added
             throw NetworkError.requestFailed(error)
         }
-        return nil
     }
     
     public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
