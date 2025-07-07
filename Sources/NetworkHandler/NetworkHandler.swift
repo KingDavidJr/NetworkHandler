@@ -4,7 +4,7 @@
 import Foundation
 
 public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
-    enum NetworkError: Error {
+    public enum NetworkError: Error {
         case invalidURL
         case invalidResponse
         case decodingError(Error)
