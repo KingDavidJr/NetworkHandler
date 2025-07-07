@@ -14,7 +14,7 @@ public final class NetworkHandler: NetworkManagerProtocol, Sendable {
     }
     
     @available(macOS 12.0, *)
-    func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
+    public func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
         do {
             guard url != URL("") else {
                 throw NetworkError.invalidURL
@@ -42,18 +42,18 @@ public final class NetworkHandler: NetworkManagerProtocol, Sendable {
         return nil
     }
     
-    func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+    public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         return try JSONDecoder().decode(T.self, from: data)
     }
     
-    func encode<T>(_ value: T) throws -> Data where T : Encodable {
+    public func encode<T>(_ value: T) throws -> Data where T : Encodable {
         return try JSONEncoder().encode(value)
     }
 }
 
 extension NetworkHandler {
     @available(macOS 12.0, *)
-    func fetchDataAndDecode<T: Decodable>(from url: URL, as type: T.Type) async throws -> T {
+    public func fetchDataAndDecode<T: Decodable>(from url: URL, as type: T.Type) async throws -> T {
         guard let data = try await fetchData(from: url) else {
             throw NetworkError.otherError(NSError(domain: "NetworkHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey : "No data returned from URL"]))
         }

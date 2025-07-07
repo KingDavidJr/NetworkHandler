@@ -6,7 +6,7 @@
 //
 import Foundation
 
-protocol NetworkHandlerURLProtocol {
+public protocol NetworkHandlerURLProtocol {
     var url: URL? { get }
     var urlAsString: String? { get }
 }

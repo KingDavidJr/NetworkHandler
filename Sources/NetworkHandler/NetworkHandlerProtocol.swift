@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol NetworkManagerProtocol {
+public protocol NetworkManagerProtocol {
     @available(macOS 12.0, *) func fetchData(from url: URL, with headers: [String: String]) async throws -> Data?
     func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T
     func encode<T: Encodable>(_ value: T) throws -> Data
