@@ -53,9 +53,9 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     }
 }
 
-extension NetworkHandler {
+public extension NetworkHandler {
     @available(iOS 15.0, macOS 12.0, *)
-    public func fetchDataAndDecode<T: Decodable>(from url: URL, as type: T.Type) async throws -> T {
+    func fetchDataAndDecode<T: Decodable>(from url: URL, as type: T.Type) async throws -> T {
         guard let data = try await fetchData(from: url) else {
             throw NetworkError.otherError(NSError(domain: "NetworkHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey : "No data returned from URL"]))
         }
