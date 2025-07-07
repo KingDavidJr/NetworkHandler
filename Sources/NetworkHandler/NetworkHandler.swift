@@ -3,7 +3,7 @@
 
 import Foundation
 
-public final class NetworkHandler: NetworkManagerProtocol, Sendable {
+public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     enum NetworkError: Error {
         case invalidURL
         case invalidResponse
@@ -12,6 +12,8 @@ public final class NetworkHandler: NetworkManagerProtocol, Sendable {
         case requestFailed(Error)
         case otherError(Error)
     }
+    
+    public init() {}
     
     @available(macOS 12.0, *)
     public func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
