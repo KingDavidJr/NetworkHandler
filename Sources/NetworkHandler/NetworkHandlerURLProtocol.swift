@@ -7,6 +7,6 @@
 import Foundation
 
 protocol NetworkHandlerURLProtocol {
-    var url: URL { get }
-    init(url: URL)
+    var url: URL? { get }
+    var urlAsString: String? { get }
 }
