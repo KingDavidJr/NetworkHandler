@@ -15,7 +15,7 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     
     public init() {}
     
-    @available(macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
         do {
             guard url != URL("") else {
