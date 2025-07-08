@@ -16,7 +16,7 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     public init() {}
     
     @available(iOS 15.0, macOS 12.0, *)
-    public func fetchData(from url: URL, with headers: [String: String] = [:]) async throws -> Data? {
+    public func fetchData(from url: URL, with headers: [String: String]? = nil) async throws -> Data? {
         do {
             guard url != URL("") else {
                 throw NetworkError.invalidURL
@@ -24,7 +24,7 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if headers != [:] {
+            if let headers = headers {
                 for (key, value) in headers {
                     request.addValue(value, forHTTPHeaderField: key)
                 }
