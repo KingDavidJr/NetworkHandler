@@ -13,22 +13,22 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
         case otherError(Error)
     }
     
+    public enum HTTPMethod: String {
+        case get = "GET"
+        case post = "POST"
+        case put = "PUT"
+        case delete = "DELETE"
+    }
+    
     public init() {}
     
     @available(iOS 15.0, macOS 12.0, *)
-    public func fetchData(from url: URL, with headers: [String: String]? = nil) async throws -> Data? {
+    public func fetchData(url: URL, httpMethod: HTTPMethod, header: [String: String]? = nil) async throws -> Data? {
         do {
             guard url != URL("") else {
                 throw NetworkError.invalidURL
             }
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let headers = headers {
-                for (key, value) in headers {
-                    request.addValue(value, forHTTPHeaderField: key)
-                }
-            }
+            var request = createRequest(url: url, httpMethod: httpMethod, header: header)
             
             let (data, response) = try await URLSession.shared.data(for: request)
 
@@ -54,12 +54,33 @@ public final class NetworkHandler: NetworkHandlerProtocol, Sendable {
     public func encode<T>(_ value: T) throws -> Data where T : Encodable {
         return try JSONEncoder().encode(value)
     }
+    
+    func createRequest(url: URL, httpMethod: HTTPMethod, header: [String: String]?) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod.rawValue
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        if let header = header {
+            guard !header.isEmpty else { return request }
+            request = addHeaders(request: request, headers: header)
+        }
+        
+        return request
+    }
+    
+    func addHeaders(request: URLRequest, headers: [String: String]) -> URLRequest {
+        var request = request
+        for (key, value) in headers {
+            request.addValue(value, forHTTPHeaderField: key)
+        }
+        return request
+    }
 }
 
 extension NetworkHandler {
     @available(iOS 15.0, macOS 12.0, *)
-    public func fetchDataAndDecode<T: Decodable>(from url: URL, as type: T.Type) async throws -> T {
-        guard let data = try await fetchData(from: url) else {
+    public func fetchDataAndDecode<T: Decodable>(url: URL, httpMethod: HTTPMethod, header: [String: String]?, as type: T.Type) async throws -> T {
+        guard let data = try await fetchData(url: url, httpMethod: httpMethod, header: header) else {
             throw NetworkError.otherError(NSError(domain: "NetworkHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey : "No data returned from URL"]))
         }
         return try decode(type, from: data)
